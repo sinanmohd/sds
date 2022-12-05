@@ -1,0 +1,42 @@
+#!/bin/sh
+# https://sinanmohd.com
+
+####################
+## user variables ##
+####################
+# dir where files are stored
+store_path="${HOME}"/.cache/pirowatch
+# torrent port
+torrent_port=49110
+# dht port
+dht_port=49130
+
+get_selection() {
+        list=$(webtorrent --mpv -o "$HOME"/.cache/pirowatch --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select |
+                grep -i ".mp4\|.mkv\|.webm\|.avi\|.mov\|.flac\|.opus\|.mp3\|.flac\|.wav")
+
+        if [ "$(echo "$list" | wc -l)" = 1 ]; then
+                printf "%s" "$list" | cut -d ' ' -f 1
+        else
+                printf "%s" "$list" | dmenu -p "  " -l 25  | cut -d ' ' -f 1
+        fi
+}
+
+start_stream() {
+        webtorrent --mpv -o "$store_path" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select "$2"
+}
+
+if [ -z "$1" ]; then
+        magnet=$(find "$DOWNLOADS"  -type f -name "*.torrent" | dmenu -p "  " -l 25)
+        [ -z "$magnet" ] && exit
+else
+        magnet="$1"
+fi
+
+selection=$(get_selection "$magnet")
+if [ -z "$selection" ]; then
+        exit
+else
+        notify-send " Connecting to peers" "please wait for few seconds"
+        start_stream "$magnet" "$selection"
+fi

@@ -1,0 +1,27 @@
+#!/bin/sh
+# https://sinanmohd.com
+
+####################
+## user variables ##
+####################
+# wireguard config name, located at /etc/wireguard/
+conf_name="kay"
+# state file location
+state_file="/tmp/vpn.dmenu"
+
+
+if [ ! -e "$state_file" ]
+then
+	if sudo -A -p "撚  initialize vpn: " wg-quick up "$conf_name" 
+        then
+                touch "$state_file" &&
+                notify-send "撚 VPN initialized" "Traffic is routing through external server" && 
+                wip
+        fi
+else
+	sudo -A -p "撚  halt vpn: " wg-quick down "$conf_name" &&
+	rm "$state_file" &&
+	notify-send "撚 VPN Halted" "Connection was dropped" &&
+        sleep 3 &&
+        wip
+fi

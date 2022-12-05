@@ -1,0 +1,60 @@
+#!/bin/sh
+# https://sinanmohd.com
+
+####################
+## user variables ##
+####################
+# dir where audio files are stored
+amb_dir="$HOME/.local/share/damb"
+# pid file location
+pid_file="/tmp/damb.pid"
+# dir where config files are stored
+config_dir="$HOME/.config/damb"
+
+get_opt()
+{
+        printf "select\nlinks\nrandom\nstream\nstop" | dmenu -p "הּ  "
+}
+
+get_ambs() 
+{
+        find "$amb_dir" -type f -exec basename {} \;
+}
+
+send_err()
+{
+        printf "error: %s\n" "$1"
+        notify-send " damb" "error, $1"
+
+}
+
+get_link()
+{
+        grep -v "^#.*$" "$config_dir"/links |
+                grep "$(grep -v "^#.*$" "$config_dir"/links | cut -d '=' -f1 | dmenu -p "  " -l 25)" |
+                cut -d '=' -f2 | tr -d ' '
+}
+
+case "$(get_opt)" in
+        select) ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | dmenu -p "  " -l 25)" &
+                echo "$!" >> "$pid_file"
+                ;;
+        links)  mpv --no-video --no-resume-playback "$(get_link)" &
+                echo "$!" >> "$pid_file"
+                ;;
+        random) ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | shuf -n1)" &
+                echo "$!" >> "$pid_file"
+                ;;
+        stop)   while IFS= read -r process
+                do
+                        kill -2 "$process"
+                done < "$pid_file"
+
+                rm "$pid_file"
+                ;;
+        stream) mpv --no-video "$(xclip -o -sel clip)" &
+                echo "$!" >> "$pid_file"
+                ;;
+        "")     ;; # stay quiet when user quits the program during selection
+        *)      send_err "option not implemented";;
+esac
