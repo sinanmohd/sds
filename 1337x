@@ -1,0 +1,88 @@
+#!/bin/sh
+
+url_1337x="https://1337x.to"
+
+die()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send "  1337x" "$1"
+
+	printf "\033[31;1merr: %b\033[0m\n" "$1"
+	exit "${2:-1}"
+}
+
+dep_check()
+{
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
+}
+
+get_1337x()
+{
+	: "${1:?}"
+	dep_check curl
+
+	curl --silent "${url_1337x}/$1"
+}
+
+search_1337x()
+{
+	: "${1:?}"
+
+	get_1337x "search/$(echo "$1" | tr ' ' '+')/1/" |
+		grep -o "[0-9][0-9][0-9][0-9][0-9][0-9][0-9]/[^/]*"
+}
+
+magnet_1337x()
+{
+	: "${1:?}"
+
+	get_1337x "torrent/$1/" |
+		grep -om1 "magnet:?xt=urn:btih:.*announce"
+}
+
+main()
+{
+	fetch=
+	select=
+	magnet=
+	out=
+	query=
+
+	dep_check "dmenu" "pirowatch"
+
+	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
+	then
+		out=true
+		shift
+	fi
+
+	query="$*"
+	: "${query:=$(printf "" | dmenu -p "  ")}"
+	[ -z "$query" ] &&
+		die "please enter a query"
+
+	fetch="$(search_1337x "$query")"
+	select="$(echo "$fetch" | sed 's/^.*\///g' | dmenu -l 25 -p "  ")"
+	magnet="$(magnet_1337x "$(echo "$fetch" | grep "$select")")"
+
+	[ -z "$magnet" ] &&
+		die "empty magnet"
+
+	if [ "$out" = true ]
+	then
+		echo "$magnet"
+	else
+		pirowatch "$magnet"
+	fi
+}
+
+main "$@"
