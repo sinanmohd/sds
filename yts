@@ -1,0 +1,101 @@
+#!/bin/sh
+
+# official
+# url_yts="https://yts.mx"
+# proxy
+url_yts="https://yts.torrentbay.to"
+
+die()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send "  yts" "$1"
+
+	printf "\033[31;1merr: %b\033[0m\n" "$1"
+	exit "${2:-1}"
+}
+
+dep_check()
+{
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
+}
+
+get_yts()
+{
+	: "${1:?}"
+	dep_check "curl"
+
+	curl --silent -H 'Accept-Encoding: gzip,deflate, br' --compressed "${url_yts}/$1"
+}
+
+search_yts()
+{
+	: "${1:?}"
+
+	get_yts "browse-movies/$(echo "$1" | sed 's/ /%20/g')/all/all/0/latest/0/all" |
+		grep browse-movie-link | sed -e 's/^.*movies\///g' -e 's/".*$//g'
+}
+
+dllink_yts()
+{
+	: "${1:?}"
+	fetch=
+	select=
+	id=
+	dep_check "dmenu"
+
+	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
+	select="$(echo "$fetch" | cut -d'>' -f2 | dmenu -l 25 -p "  ")"
+	[ -z "$select" ] &&
+		die "please select a quality"
+	id="$(echo "$fetch" | grep "$select" | cut -d'"' -f2)"
+	printf "${url_yts}/torrent/download/%s\n" "$id"
+
+	unset id
+	unset select
+	unset fetch
+}
+
+main()
+{
+	fetch=
+	dllink=
+	out=
+	query=
+
+	dep_check "dmenu" "pirowatch"
+
+	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
+	then
+		out=true
+		shift
+	fi
+
+	query="$*"
+	: "${query:=$(printf "" | dmenu -p "  ")}"
+	[ -z "$query" ] &&
+		die "please enter a query"
+
+	fetch="$(search_yts "$query")"
+	dllink="$(dllink_yts "$(echo "$fetch" | dmenu -l 25 -p "  ")")"
+
+	[ -z "$dllink" ] &&
+		die "empty magnet"
+
+	if [ "$out" = true ]
+	then
+		echo "$dllink"
+	else
+		pirowatch "$dllink"
+	fi
+}
+
+main "$@"

@@ -10,6 +10,9 @@ pirowatch is a dmenu wrapper for [web torrent](https://webtorrent.io/), provide 
 ## 1337x
 scraper for 1337x.to, has an optional dependency on pirowatch. if you pass "-o" as the first argument it'll print the scraped magnet link to stdin otherwise it will pass the magnet link to pirowatch
 
+## yts
+scraper for yts.mx, has an optional dependency on pirowatch. if you pass "-o" as the first argument it'll print the scraped torrent link to stdin otherwise it will pass the link to pirowatch
+
 ## vpn
 dmenu wrapper for wireguard, depends on wip
 
