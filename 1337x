@@ -1,6 +1,7 @@
 #!/bin/sh
 
 url_1337x="https://1337x.to"
+proxy_1337x="https://1337x.torrentbay.to"
 
 die()
 {
@@ -57,13 +58,16 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu" "pirowatch"
+	dep_check "dmenu" "pirowatch" "curl"
 
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
 		out=true
 		shift
 	fi
+
+	curl -Is "$url_1337x" > /dev/null ||
+		url_1337x="$proxy_1337x"
 
 	query="$*"
 	: "${query:=$(printf "" | dmenu -p "  ")}"

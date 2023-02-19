@@ -1,9 +1,7 @@
 #!/bin/sh
 
-# official
-# url_yts="https://yts.mx"
-# proxy
-url_yts="https://yts.torrentbay.to"
+url_yts="https://yts.mx"
+proxy_yts="https://yts.torrentbay.to"
 
 die()
 {
@@ -71,7 +69,7 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu" "pirowatch"
+	dep_check "dmenu" "pirowatch" "curl"
 
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
@@ -83,6 +81,9 @@ main()
 	: "${query:=$(printf "" | dmenu -p "  ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
+
+	curl -Is "$url_yts" > /dev/null ||
+		url_yts="$proxy_yts"
 
 	fetch="$(search_yts "$query")"
 	dllink="$(dllink_yts "$(echo "$fetch" | dmenu -l 25 -p "  ")")"
