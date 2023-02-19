@@ -31,7 +31,7 @@ get_1337x()
 	: "${1:?}"
 	dep_check curl
 
-	curl --silent "${url_1337x}/$1"
+	curl --silent -H 'Accept-Encoding: gzip,deflate, br' --compressed "${url_1337x}/$1"
 }
 
 search_1337x()
