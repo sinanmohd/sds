@@ -85,7 +85,7 @@ main()
 		url_yts="$proxy_yts"
 
 	fetch="$(search_yts "$query")"
-	dllink="$(dllink_yts "$(echo "$fetch" | dmenu -l 25 -p "  ")")"
+	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | dmenu -l 25 -p "  " | tr ' ' '-')")"
 
 	[ -z "$dllink" ] &&
 		die "empty magnet"

@@ -74,7 +74,7 @@ main()
 		die "please enter a query"
 
 	fetch="$(search_1337x "$query")"
-	select="$(echo "$fetch" | sed 's/^.*\///g' | dmenu -l 25 -p "  ")"
+	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | dmenu -l 25 -p "  " | tr ' ' '-')"
 	magnet="$(magnet_1337x "$(echo "$fetch" | grep "$select")")"
 
 	[ -z "$magnet" ] &&
