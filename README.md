@@ -18,12 +18,12 @@ as command line argument or input from dmenu and consoom the media using [mpv](h
 
 ## 1337x
 scraper for 1337x.to, has an optional dependency on pirowatch. if you pass "-o"
-as the first argument it'll print the scraped magnet link to stdin otherwise
+as the first argument it'll print the scraped magnet link to stdout otherwise
 it will pass the magnet link to pirowatch
 
 ## yts
 scraper for yts.mx, has an optional dependency on pirowatch. if you pass "-o"
-as the first argument it'll print the scraped torrent link to stdin otherwise
+as the first argument it'll print the scraped torrent link to stdout otherwise
 it will pass the link to pirowatch
 
 ## vpn
