@@ -95,7 +95,7 @@ main()
 	then
 		echo "$dllink"
 	else
-		pirowatch "$dllink"
+		pirowatch -s "$dllink"
 	fi
 }
 
