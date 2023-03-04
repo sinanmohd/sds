@@ -44,6 +44,9 @@ stream() {
 	else
 		webtorrent --mpv -o "$cache_dir" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1"
 	fi
+
+	[ "$?" != 0 ] &&
+		die "webtorrent failed to play"
 }
 
 set_index() {
