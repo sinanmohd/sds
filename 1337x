@@ -69,8 +69,7 @@ main()
 	curl -Is "$url_1337x" > /dev/null ||
 		url_1337x="$proxy_1337x"
 
-	query="$*"
-	: "${query:=$(printf "" | dmenu -p "  ")}"
+	query="${*:-$(printf "" | dmenu -p "  ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 

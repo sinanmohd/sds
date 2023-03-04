@@ -77,8 +77,7 @@ main()
 		shift
 	fi
 
-	query="$*"
-	: "${query:=$(printf "" | dmenu -p "  ")}"
+	query="${*:-$(printf "" | dmenu -p "  ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 
