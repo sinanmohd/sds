@@ -1,42 +1,87 @@
 #!/bin/sh
-# https://sinanmohd.com
 
-####################
-## user variables ##
-####################
-# dir where files are stored
-store_path="${HOME}"/.cache/pirowatch
+# dir where files are cached
+cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/pirowatch"
+# dir where torrent files are stored
+torrent_dir="${DOWNLOADS:-$HOME/Downloads}"
 # torrent port
 torrent_port=49110
 # dht port
 dht_port=49130
 
-get_selection() {
-        list=$(webtorrent --mpv -o "$HOME"/.cache/pirowatch --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select |
-                grep -i ".mp4\|.mkv\|.webm\|.avi\|.mov\|.flac\|.opus\|.mp3\|.flac\|.wav")
+die()
+{
+	# usage: die "reason" [exit_status]
+	: "${1:?}"
 
-        if [ "$(echo "$list" | wc -l)" = 1 ]; then
-                printf "%s" "$list" | cut -d ' ' -f 1
-        else
-                printf "%s" "$list" | dmenu -p "  " -l 25  | cut -d ' ' -f 1
-        fi
+	notify-send "  pirowatch" "$1"
+	printf "\033[31;1merr: %b\033[0m\n" "$1"
+	exit "${2:-1}"
 }
 
-start_stream() {
-        webtorrent --mpv -o "$store_path" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select "$2"
+dep_check()
+{
+	# usage: dep_check "dep_1" ...
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
 }
 
-if [ -z "$1" ]; then
-        magnet=$(find "$DOWNLOADS"  -type f -name "*.torrent" | dmenu -p "  " -l 25)
-        [ -z "$magnet" ] && exit
-else
-        magnet="$1"
-fi
+stream() {
+	# usage: stream "torrent"
+	: "${1:?}"
 
-selection=$(get_selection "$magnet")
-if [ -z "$selection" ]; then
-        exit
-else
-        notify-send " Connecting to peers" "please wait for few seconds"
-        start_stream "$magnet" "$selection"
-fi
+	notify-send " connecting to peers" "wait for few seconds"
+
+	if [ -n "$2" ]
+	then
+		webtorrent --mpv -o "$cache_dir" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select "$2"
+	else
+		webtorrent --mpv -o "$cache_dir" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1"
+	fi
+}
+
+set_index() {
+	# usage: get_index "torrent"
+	: "${1:?}"
+
+        fetch=$(webtorrent --mpv -o "$cache_dir" --torrent-port "$torrent_port" --dht-port "$dht_port" "$1" --select |
+		grep -Ei "\.(mkv|mp4|webm|avi|mov|flv|flac|opus|ogg|mp3|wav) (.*)$")
+        if [ "$(echo "$fetch" | wc -l)" -gt 1 ]
+	then
+		fetch="$(printf "%s" "$fetch" | dmenu -p "  " -l 25)" ||
+			die "empty selection" 66
+	fi
+
+	index="${fetch%%[[:space:]]*}"
+
+	unset fetch
+}
+
+main()
+{
+	index="tobeset"
+	if [ "$1" = "-s" ]
+	then
+		index=
+		shift
+	fi
+	torrent="${1:-$torrent_dir/$(find "$torrent_dir" -type f -name "*.torrent" | sed 's/.*\///g' | dmenu -p "  " -l 25)}"
+
+	dep_check "webtorrent" "mpv" "notify-send"
+	[ -z "${torrent##"${torrent_dir}"/}" ] &&
+		die "magnet or torrent file not entered" 66
+	[ -d "$cache_dir" ] ||
+		mkdir -p "$cache_dir"
+	[ "$index" = "tobeset" ] &&
+		set_index "$torrent"
+
+	stream "$torrent" "$index"
+}
+
+main "$@"

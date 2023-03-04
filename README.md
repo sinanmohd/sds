@@ -14,7 +14,9 @@ the stream option. mix together varous ambient sounds and stream with damb
 
 ## pirowatch
 pirowatch is a dmenu wrapper for [web torrent](https://webtorrent.io/), provide magnet or torrent files
-as command line argument or input from dmenu and consoom the media using [mpv](https://mpv.io/)
+as command line argument or input from dmenu and consoom the media using [mpv](https://mpv.io/).
+if you pass "-s" as the first argument it'll skip index selection to speed up
+the launching
 
 ## 1337x
 scraper for 1337x.to, has an optional dependency on pirowatch. if you pass "-o"
