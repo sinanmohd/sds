@@ -48,7 +48,6 @@ dllink_yts()
 	fetch=
 	select=
 	id=
-	dep_check "dmenu"
 
 	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
 	select="$(echo "$fetch" | cut -d'>' -f2 | dmenu -l 25 -p "  ")"
@@ -69,7 +68,7 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu" "pirowatch" "curl"
+	dep_check "dmenu"
 
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
@@ -94,6 +93,7 @@ main()
 	then
 		echo "$dllink"
 	else
+		dep_check "pirowatch"
 		pirowatch -s "$dllink"
 	fi
 }

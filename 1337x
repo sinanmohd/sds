@@ -29,7 +29,7 @@ dep_check()
 get_1337x()
 {
 	: "${1:?}"
-	dep_check curl
+	dep_check "curl"
 
 	curl --silent -H 'Accept-Encoding: gzip,deflate, br' --compressed "${url_1337x}/$1"
 }
@@ -58,7 +58,7 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu" "pirowatch" "curl"
+	dep_check "dmenu"
 
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
@@ -84,6 +84,7 @@ main()
 	then
 		echo "$magnet"
 	else
+		dep_check "pirowatch"
 		pirowatch "$magnet"
 	fi
 }
