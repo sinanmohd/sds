@@ -29,7 +29,9 @@ as the first argument it'll print the scraped torrent link to stdout otherwise
 it will pass the link to pirowatch
 
 ## vpn
-dmenu wrapper for wireguard, depends on wip
+dmenu wrapper for wireguard, has an optional dependency on wip. you can pass
+wireguard config name as the first argument otherwise it will use the default
+value which is "wg0"
 
 ## wip - what is my ip
 wip queries host's ipv4 address using opendns and displays the ip details using
