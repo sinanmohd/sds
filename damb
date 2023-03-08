@@ -49,7 +49,7 @@ get_link()
 main()
 {
 	[ -z "$DISPLAY" ] &&
-		menu="bemenu"
+		menu="wmenu"
 
 	dep_check "$menu"
 

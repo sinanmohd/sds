@@ -83,7 +83,7 @@ main()
 		shift
 	fi
 	[ -z "$DISPLAY" ] &&
-		menu="bemenu"
+		menu="wmenu"
 
 	dep_check "$menu"
 

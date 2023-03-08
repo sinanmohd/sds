@@ -70,7 +70,7 @@ main()
 	query=
 
 	[ -z "$DISPLAY" ] &&
-		menu="bemenu"
+		menu="wmenu"
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
 		out=true
