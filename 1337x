@@ -2,6 +2,7 @@
 
 url_1337x="https://1337x.to"
 proxy_1337x="https://1337x.torrentbay.to"
+menu="dmenu"
 
 die()
 {
@@ -58,23 +59,25 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu"
-
+	[ -z "$DISPLAY" ] &&
+		menu="bemenu"
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
 		out=true
 		shift
 	fi
 
+	dep_check "$menu"
+
 	curl -Is "$url_1337x" > /dev/null ||
 		url_1337x="$proxy_1337x"
 
-	query="${*:-$(printf "" | dmenu -p "  ")}"
+	query="${*:-$(printf "" | "$menu" -p "  ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 
 	fetch="$(search_1337x "$query")"
-	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | dmenu -l 25 -p "  " | tr ' ' '-')"
+	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | "$menu" -l 25 -p "  " | tr ' ' '-')"
 	magnet="$(magnet_1337x "$(echo "$fetch" | grep "$select")")"
 
 	[ -z "$magnet" ] &&

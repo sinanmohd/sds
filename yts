@@ -2,6 +2,7 @@
 
 url_yts="https://yts.mx"
 proxy_yts="https://yts.torrentbay.to"
+menu="dmenu"
 
 die()
 {
@@ -50,7 +51,7 @@ dllink_yts()
 	id=
 
 	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
-	select="$(echo "$fetch" | cut -d'>' -f2 | dmenu -l 25 -p "  ")"
+	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -l 25 -p "  ")"
 	[ -z "$select" ] &&
 		die "please select a quality"
 	id="$(echo "$fetch" | grep "$select" | cut -d'"' -f2)"
@@ -68,15 +69,17 @@ main()
 	out=
 	query=
 
-	dep_check "dmenu"
-
+	[ -z "$DISPLAY" ] &&
+		menu="bemenu"
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
 		out=true
 		shift
 	fi
 
-	query="${*:-$(printf "" | dmenu -p "  ")}"
+	dep_check "$menu"
+
+	query="${*:-$(printf "" | "$menu" -p "  ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 
@@ -84,7 +87,7 @@ main()
 		url_yts="$proxy_yts"
 
 	fetch="$(search_yts "$query")"
-	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | dmenu -l 25 -p "  " | tr ' ' '-')")"
+	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p "  " | tr ' ' '-')")"
 
 	[ -z "$dllink" ] &&
 		die "empty magnet"
