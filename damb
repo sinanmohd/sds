@@ -100,4 +100,4 @@ main()
 	esac
 }
 
-main
+main "$@"
