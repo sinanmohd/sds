@@ -1,8 +1,10 @@
-# sds - sinan's dmenu scripts
+# sds - sinan's dmenu scripts (formerly xorg only)
 [dmenu](https://tools.suckless.org/dmenu/) is a fast and lightweight dynamic menu for X written by the
-[suckless](https://suckless.org/) community. this is my collection of posix scripts for dmenu. these
+[suckless](https://suckless.org/) community. this is my collection of posix scripts for dmenu like
+programs. these scipts were initially made for dmenu with xorg in mind, now
+they work on both xorg and wayland using dmenu and bemenu respectively. these
 scripts might use [nerd fonts](https://www.nerdfonts.com/), make sure you've installed them for the best
-experience. you can find more info about them below
+experience. you can find more info about them below.
 
 ## damb - dmenu ambience
 listen to ambient music while working on somthing fun. audio files should be
