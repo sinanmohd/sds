@@ -3,4 +3,7 @@
 
 current_ip=$(dig +short myip.opendns.com @208.67.222.222)
 geo_loc_ip=$(geoiplookup  "$current_ip" | grep -v "Country" | sed 's/^.*: //g')
-notify-send "   $current_ip" "$geo_loc_ip"
+
+command -v "notify-send" 1>/dev/null &&
+	notify-send "   $current_ip" "$geo_loc_ip"
+printf "ipv4: %s\n%s\n" "$current_ip" "$geo_loc_ip"
