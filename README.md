@@ -11,7 +11,7 @@ listen to ambient music while working on somthing fun. audio files should be
 stored at ~/.local/share/damb/. damb also has a config file located
 at ~/.conf/damb/links, where you can provide direct links to media sources or
 links to youtube-dl supported sites, it should be in the
-format \<name> = \<link>, you can also play links from your clipboard using
+format, name = link, you can also play links from your clipboard using
 the stream option. mix together varous ambient sounds and stream with damb
 
 ## pirowatch
