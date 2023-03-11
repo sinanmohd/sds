@@ -6,6 +6,10 @@ they work on both xorg and wayland using dmenu and wmenu respectively. these
 scripts might use [nerd fonts](https://www.nerdfonts.com/), make sure you've installed them for the best
 experience. you can find more info about them below.
 
+## dpass
+dpass is the dmenu wrapper for the standard unix password manager,
+run dpass -h from a terminal to see what it's capable of
+
 ## damb - dmenu ambience
 listen to ambient music while working on somthing fun. audio files should be
 stored at ~/.local/share/damb/. damb also has a config file located

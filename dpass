@@ -1,0 +1,111 @@
+#!/bin/sh
+
+pass_store_dir="${PASSWORD_STORE_DIR:-$HOME/.pass}"
+menu="wmenu"
+
+die()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send "  dpass" "$1"
+
+	printf "\033[31;1merr: %b\033[0m\n" "$1"
+	exit "${2:-1}"
+}
+
+dep_check()
+{
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
+}
+
+note()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send "󰟵 dpass" "$1"
+}
+
+search()
+{
+	# usage: search directory
+	pass_path="${1:?}"
+
+	while [ -d "$pass_path" ]
+	do
+		pass_path="${pass_path}/$(printf '%s\n' "$pass_path"/* |
+			sed 's/.*\///g' |
+			"$menu" -l 25 -p "󰟵 ${pass_path##*/} ")"
+
+		[ "$?" != 0 ] &&
+			die "noting selected"
+	done
+
+	pass_path="${pass_path#"${pass_store_dir}"/}"
+	pass_path="${pass_path%.gpg}"
+}
+
+main()
+{
+	pass_path=
+
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
+
+	dep_check "$menu" "pass"
+
+	case "$1" in
+	-o)
+		search "$pass_store_dir"
+		pass "$pass_path"
+		;;
+	-c)
+		if [ -z "$WAYLAND_DISPLAY" ]
+		then
+			dep_check "xclip"
+		else
+			dep_check "wl-copy"
+		fi
+
+		search "$pass_store_dir"
+		pass --clip "$pass_path"
+		note "password copied to clipboard, will clear in 45 seconds."
+		;;
+	-h|--help)
+		cat <<- EOF
+			Usage: dpass command
+			dmenu wrapper for the standard unix password manager
+			Commands:
+			  -h	show this help cruft
+			  -o	print the password to stdout
+			  -c	coppy the password to clipboard
+			  -t	type the password (default behaviour)
+		EOF
+		;;
+	""|-t)
+		if [ -z "$WAYLAND_DISPLAY" ]
+		then
+			dep_check "xdotool"
+			search "$pass_store_dir"
+			xdotool type --delay 20 "$(pass "$pass_path")"
+		else
+			dep_check "wtype"
+			search "$pass_store_dir"
+			wtype -d 20 "$(pass "$pass_path")"
+		fi
+		;;
+	*)
+		die "${0##*/} $1, invalid usage"
+		;;
+	esac
+}
+
+main "$@"
