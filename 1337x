@@ -2,7 +2,7 @@
 
 url_1337x="https://1337x.to"
 proxy_1337x="https://1337x.torrentbay.to"
-menu="dmenu"
+menu="wmenu"
 
 die()
 {
@@ -59,8 +59,8 @@ main()
 	out=
 	query=
 
-	[ -z "$DISPLAY" ] &&
-		menu="wmenu"
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
 	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
 	then
 		out=true

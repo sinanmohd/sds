@@ -4,7 +4,7 @@
 amb_dir="$HOME/.local/share/damb"
 pid_file="/tmp/damb.pid"
 config_dir="$HOME/.config/damb"
-menu="dmenu"
+menu="wmenu"
 
 die()
 {
@@ -48,8 +48,8 @@ get_link()
 
 main()
 {
-	[ -z "$DISPLAY" ] &&
-		menu="wmenu"
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
 
 	dep_check "$menu"
 
