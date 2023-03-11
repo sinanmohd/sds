@@ -8,7 +8,10 @@ experience. you can find more info about them below.
 
 ## dpass
 dpass is the dmenu wrapper for the standard unix password manager,
-run dpass -h from a terminal to see what it's capable of
+run dpass -h from a terminal to see what it's capable of.
+reasons to use dpass over passmenu
+* dpass is posix compliant.
+* dpass keeps the tree structure of pass.
 
 ## damb - dmenu ambience
 listen to ambient music while working on somthing fun. audio files should be
