@@ -12,7 +12,7 @@ main()
 {
 	wg_conf="${1:-wg0}"
 
-	if ip -details link show "$wg_conf" 2> /dev/null | grep "wireguard" > /dev/null 2>&1
+	if ip -details link show "$wg_conf" 2> /dev/null | grep --quiet "wireguard"
 	then
 		sudo -A -p "撚  halt vpn: " wg-quick down "$wg_conf" &&
 			note "connection was dropped"
