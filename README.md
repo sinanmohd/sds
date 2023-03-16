@@ -1,4 +1,4 @@
-# sds - sinan's dmenu scripts (formerly xorg only)
+# sds - sinan's (or simple) dmenu scripts (formerly xorg only)
 [dmenu](https://tools.suckless.org/dmenu/) is a fast and lightweight dynamic menu for X written by the
 [suckless](https://suckless.org/) community. this is my collection of posix scripts for dmenu like
 programs. these scipts were initially made for dmenu with xorg in mind, now
