@@ -6,6 +6,14 @@ they work on both xorg and wayland using dmenu and wmenu respectively. these
 scripts might use [nerd fonts](https://www.nerdfonts.com/), make sure you've installed them for the best
 experience. you can find more info about them below.
 
+## dbook
+dbook is a bookmark manager, it can bookmark directories, files, text, links,
+anything, by default dbook will try to represent the data best way possoble
+ie open links using the browser, coppy text to clipboard, if it's a video
+open using a video player, etc. use -i or -s to add an entry or directly
+modify the config file located at ~/.config/dbook/dbook.conf. dbook can
+also copy bookmarks and type them.
+
 ## dpass
 dpass is the dmenu wrapper for the standard unix password manager,
 run dpass -h from a terminal to see what it's capable of.

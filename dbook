@@ -1,0 +1,309 @@
+#!/bin/sh
+
+book_conf="${XDG_CONFIG_HOME:-$HOME/.config}/dbook/dbook.conf"
+book_data="${XDG_DATA_HOME:-$HOME/.local/share}/dbook"
+menu="wmenu"
+
+note()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send " dbook" "$1"
+}
+
+die()
+{
+	: "${1:?}"
+
+	note "$1"
+	printf "\033[31;1merr: %b\033[0m\n" "$1" 1>&2
+	exit "${2:-1}"
+}
+
+dep_check()
+{
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
+}
+
+parse_name()
+{
+	while read -r line
+	do
+		line=${line%%|*}
+
+		# trim leading and trailing white spaces
+		line=${line#"${line%%[![:space:]]*}"}
+		line=${line%"${line##*[![:space:]]}"}
+
+		[ -z "${line##\#*}" ] &&
+			continue
+
+		echo "$line"
+	done < "$book_conf"
+}
+
+parse_data()
+{
+	read -r book_name
+	read_name=
+
+	[ -z "$book_name" ] || [ ! -f "$book_conf" ] &&
+		return 1
+
+	while read -r line
+	do
+		# trim leading and trailing white spaces
+		line=${line#"${line%%[![:space:]]*}"}
+		line=${line%"${line##*[![:space:]]}"}
+
+		# skip trailing lines till match
+		case "$line" in
+		"$book_name"*)
+			# make sure read_name fully matches book_name
+			read_name=${line%%|*}
+			read_name=${read_name%"${read_name##*[![:space:]]}"}
+			[ "$book_name" != "$read_name" ] &&
+				continue
+			;;
+		*)
+			continue
+			;;
+		esac
+
+		# extract date from string
+		line="${line##*|}"
+		line=${line#"${line%%[![:space:]]*}"}
+
+		echo "$line"
+		return 0
+
+	done < "$book_conf"
+
+	unset read_name
+	return 1
+}
+
+rm_data()
+{
+	# usage rm_data [data_name]
+	: "${1:?}"
+	read_name=
+	data=
+	cl=
+	file=
+
+	while read -r line
+	do
+		cl="$line\n"
+
+		# trim leading and trailing white spaces
+		line=${line#"${line%%[![:space:]]*}"}
+		line=${line%"${line##*[![:space:]]}"}
+
+		# catch match
+		case "$line" in
+		"$book_name"*)
+			read_name=${line%%|*}
+			read_name=${read_name%"${read_name##*[![:space:]]}"}
+
+			# make sure read_name fully matches
+			if [ "$1" = "$read_name" ]
+			then
+				# remove saved data
+				data="$(echo "$read_name" | parse_data)"
+				[ -e "$data" ] && [ -z "${data##"${book_data}"/*}" ] &&
+					rm "$data"
+
+				continue
+			fi
+			;;
+		esac
+
+		file="${file}${cl}"
+
+	done < "$book_conf"
+
+	# shellcheck disable=SC2059
+	printf "$file" > "$book_conf"
+	unset read_name data file cl
+}
+
+entry()
+{
+	printf "" | "$menu" -p " ${1:?} " ||
+		die "input empty"
+}
+
+sh_realpath()
+{
+	# usage: sh_realpath [path]
+	: "${1:?}"
+
+	if [ -z "${1##/*}" ]
+	then
+		echo "$1"
+	else
+		echo "${PWD:-$(pwd)}/$1"
+	fi
+}
+
+clip()
+{
+	# usage: clip [data]
+	: "${1:?}"
+
+	if [ -z "$WAYLAND_DISPLAY" ]
+	then
+		dep_check "xclip"
+		echo "$1" | xclip -selection clipboard
+	else
+		dep_check "wl-copy"
+		echo "$1" | wl-copy
+	fi &&
+		note "data coppied to clipboard"
+}
+
+clip_file()
+{
+	# usage: clip [data]
+	: "${1:?}"
+
+	if [ -z "$WAYLAND_DISPLAY" ]
+	then
+		dep_check "xclip"
+		echo "$1" | xclip -selection clipboard "$1" -t text/uri-list
+	else
+		dep_check "wl-copy"
+		echo "$1" | wl-copy -t text/uri-list
+	fi &&
+		note "data coppied to clipboard"
+}
+
+main()
+{
+	name=
+	data=
+
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
+
+	[ -d "$book_data" ] ||
+		mkdir -p "$book_data"
+	[ -d "$book_conf" ] ||
+		mkdir -p "${book_conf%/*}"
+
+	case "$1" in
+	-h|--help)
+		cat <<- EOF
+		Usage: dbook command
+		a bookmark manager using dmenu
+		Commands:
+		  -h	show this help cruft
+		  -i	[bookmark string] [bookmark name], inset a new entry
+		  -s	[bookmark string] [bookmark name], inset a new entry and make a copy
+		  -d	[bookmark name], delete an entry
+		  -t	[bookmark name], type the data
+		  -c	[bookmark name], copy the date to clipboard
+		EOF
+		;;
+	-i)
+		data="${2:-$(entry name)}"
+		shift > /dev/null 2>&1
+		shift > /dev/null 2>&1
+		name="${*:-$(entry name)}"
+
+		echo "$name" | parse_data > /dev/null &&
+			die "name already in use"
+
+		[ -e "$data" ] &&
+			data="$(sh_realpath "$data")"
+
+		printf "%s\t|\t%s\n" "$name" "$data" >> "$book_conf"
+		;;
+	-s)
+		data="${2:-$(entry name)}"
+		shift > /dev/null 2>&1
+		shift > /dev/null 2>&1
+		name="${*:-$(entry name)}"
+
+		echo "$name" | parse_data > /dev/null &&
+			die "name already in use"
+
+		[  -d "$data" ] &&
+			die "$data is a directory, use -i instead"
+
+		if [ -e "$data" ]
+		then
+			cp "$data" "$book_data"
+			data="${book_data}/${data##*/}"
+		fi
+
+		printf "%s\t|\t%s\n" "$name" "$data" >> "$book_conf"
+		;;
+	-d)
+		rm_data "${2:-"$(parse_name | "$menu" -p " " -l 25)"}"
+		;;
+	-t)
+		shift > /dev/null 2>&1
+		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
+		[ -z "$data" ] &&
+			die "empty, use -i to add an entry"
+
+		if [ -z "$WAYLAND_DISPLAY" ]
+		then
+			dep_check "xdotool"
+			xdotool type --delay 20 "$data"
+		else
+			dep_check "wtype"
+			wtype -d 20 "$data"
+		fi
+		;;
+	-c)
+		shift > /dev/null 2>&1
+		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
+		[ -z "$data" ] &&
+			die "empty, use -i to add an entry"
+
+		case "$(file --brief "$data")" in
+		*ASCII\ text*)
+			clip "$(cat "$data")"
+			;;
+		*No\ such\ file\ or\ directory\))
+			clip "$data"
+			;;
+		*)
+			clip_file "$(printf "file://%s" "$data")"
+			;;
+		esac
+		;;
+	"")
+		dep_check "xdg-open"
+
+		data="$(parse_name | "$menu" -p " " -l 25 | parse_data)"
+		[ -z "$data" ] &&
+			die "empty, use -i to add an entry"
+
+		xdg-open "$data" 2> /dev/null ||
+			case "$(file --brief "$data")" in
+			*ASCII\ text*)
+				clip "$(cat "$data")"
+				;;
+			*)
+				clip "$data"
+				;;
+			esac
+		;;
+	*)
+		die "$1, invalid usage"
+	esac
+}
+
+main "$@"
