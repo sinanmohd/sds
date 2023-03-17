@@ -99,7 +99,9 @@ rm_data()
 	data=
 	cl=
 	file=
+	oid_ifs="$IFS"
 
+	IFS=
 	while read -r line
 	do
 		cl="$line\n"
@@ -130,10 +132,11 @@ rm_data()
 		file="${file}${cl}"
 
 	done < "$book_conf"
+	IFS="$old_ifs"
 
 	# shellcheck disable=SC2059
 	printf "$file" > "$book_conf"
-	unset read_name data file cl
+	unset read_name data file cl old_ifs
 }
 
 entry()
