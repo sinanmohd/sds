@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# this can be used as a password prompt.
+
+if [ -z "$WAYLAND_DISPLAY" ]
+then
+	printf "" | dmenu -P -p "$1"
+else
+	printf "" | wmenu -P -p "$1"
+fi

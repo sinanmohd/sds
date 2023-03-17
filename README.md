@@ -53,3 +53,6 @@ value which is "wg0"
 ## wip - what is my ip
 wip queries host's ipv4 address using opendns and displays the ip details using
 the geoip database
+
+## daskpass
+this can be used as a password prompt. to use it with sudo set SUDO_ASKPASS
