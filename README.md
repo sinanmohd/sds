@@ -66,3 +66,6 @@ the geoip database
 
 ## daskpass
 this can be used as a password prompt. to use it with sudo set SUDO_ASKPASS
+
+## dunicode
+script to copy and type unicode characters

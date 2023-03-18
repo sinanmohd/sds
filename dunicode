@@ -1,0 +1,101 @@
+#!/bin/sh
+set -e
+
+data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/unicode"
+menu="wmenu"
+
+note()
+{
+	: "${1:?}"
+
+	command -v notify-send > /dev/null &&
+		notify-send "  dunicode" "$1"
+}
+
+die()
+{
+	: "${1:?}"
+
+	note "$1"
+	printf "\033[31;1merr: %b\033[0m\n" "$1" 1>&2
+	exit "${2:-1}"
+}
+
+dep_check()
+{
+	: "${1:?}"
+
+	for dep; do
+		command -v "$dep" 1>/dev/null ||
+			die "$dep not found, please install it" 127
+	done
+
+	unset dep
+}
+
+get_glyph()
+{
+
+	str=
+
+	for glyph in "$data_dir"/*
+	do
+		[ -s "$glyph" ] &&
+			str="${str}${glyph##*/}\n"
+	done
+
+	[ -z "$str" ] &&
+		die "no glyphs available, put them in $data_dir"
+
+	# shellcheck disable=SC2059
+	[ -n "${str#*\n}" ] &&
+		str="$(printf "$str" | "$menu" -p " ")"
+
+	str="$("$menu" -l 25 -p " " < "${data_dir}/${str}")"
+	echo "${str%%[[:space:]]*}"
+
+	unset str
+}
+
+main()
+{
+
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
+
+	case "$1" in
+	-h)
+		printf "usage: %s %s" "${0##*/}" "[-ct]"
+		;;
+	-c)
+		glyph="$(get_glyph)"
+
+		if [ -z "$WAYLAND_DISPLAY" ]
+		then
+			dep_check "xclip"
+			printf "%s" "$glyph" | xclip -selection clipboard
+		else
+			dep_check "wl-copy"
+			printf "%s" "$glyph" | wl-copy
+		fi &&
+			note "$glyph coppied to clipboard"
+		;;
+	-t|"")
+		glyph="$(get_glyph)"
+
+		if [ -z "$WAYLAND_DISPLAY" ]
+		then
+			dep_check "xdotool"
+			xdotool type --delay 20 "$glyph"
+		else
+			dep_check "wtype"
+			wtype -d 20 "$glyph"
+		fi
+		;;
+	*)
+		die "invalid usage: ${0##*/} $*"
+		;;
+	esac
+}
+
+main "$@"
