@@ -1,0 +1,47 @@
+#!/bin/sh
+
+menu="wmenu"
+cache_dir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
+cache="$cache_dir/wmenu_run"
+
+uptodate()
+{
+	IFS=:
+	for path  in $PATH
+	do
+		test "$path" -nt "$cache" &&
+			return 1
+	done
+
+	return 0
+}
+
+get_bin()
+{
+	IFS=:
+	for path in $PATH
+	do
+		for bin in "$path"/*
+		do
+			[ -x "$bin" ] &&
+				echo "${bin##*/}"
+		done
+	done
+}
+
+main()
+{
+	[ -d "$cache_dir" ] ||
+		mkdir -p "$cache_dir"
+	[ -z "$WAYLAND_DISPLAY" ] &&
+		menu="dmenu"
+
+	if [ -f "$cache" ] && uptodate
+	then
+		"$menu" "$@" < "$cache" | ${SHELL:-"/bin/sh"} &
+	else
+		get_bin | sort -u | tee "$cache" | "$menu" "$@" | ${SHELL:-"/bin/sh"} &
+	fi
+}
+
+main "$@"

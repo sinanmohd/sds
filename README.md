@@ -45,6 +45,16 @@ scraper for yts.mx, has an optional dependency on pirowatch. if you pass "-o"
 as the first argument it'll print the scraped torrent link to stdout otherwise
 it will pass the link to pirowatch
 
+## menu_run
+this scripts does the same job as the dmenu_run script, they why use it?
+dmenu_run depends on stest, they will not be available if you're not
+running xorg and don't have dmenu installed. menu_run only uses built in sh
+commands but if the cache is not prepared dmenu_run will run about
+1.16 +- 0.04 faster than the mentioned script, if it is then menu_run
+will run 2.54 +- 0.26 faster than dmenu_run, which will be the most likely
+situation . though the scale of the gains are very small the main goal
+of the script is to get rid of dependence on stest and dmenu
+
 ## vpn
 dmenu wrapper for wireguard, has an optional dependency on wip. you can pass
 wireguard config name as the first argument otherwise it will use the default
