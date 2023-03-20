@@ -99,7 +99,7 @@ rm_data()
 	data=
 	cl=
 	file=
-	oid_ifs="$IFS"
+	old_ifs="$IFS"
 
 	IFS=
 	while read -r line
