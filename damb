@@ -96,7 +96,7 @@ main()
 	"")
 		;; # stay quiet when user quits the program during selection
 	*)
-		"option not implemented";;
+		die "option not implemented";;
 	esac
 }
 
