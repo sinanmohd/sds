@@ -42,9 +42,7 @@ search()
 	do
 		pass_path="${pass_path}/$(printf '%s\n' "$pass_path"/* |
 			sed 's/.*\///g' |
-			"$menu" -l 25 -p "󰟵 ${pass_path##*/} ")"
-
-		[ "$?" != 0 ] &&
+			"$menu" -l 25 -p "󰟵 ${pass_path##*/} ")" ||
 			die "noting selected"
 	done
 
