@@ -19,9 +19,7 @@ main()
 	else
 		sudo -A -p " init, authentication required: " wg-quick up "$wg_conf" &&
 			note "traffic routed through $wg_conf"
-	fi
-
-	command -v wip > /dev/null &&
+	fi && command -v wip > /dev/null &&
 		wip
 }
 
