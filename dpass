@@ -3,12 +3,19 @@
 pass_store_dir="${PASSWORD_STORE_DIR:-$HOME/.pass}"
 menu="wmenu"
 
-die()
+note()
 {
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send "  dpass" "$1"
+		notify-send "󰟵  dpass" "$1"
+}
+
+die()
+{
+	: "${1:?}"
+
+	note "$1"
 
 	printf "\033[31;1merr: %b\033[0m\n" "$1"
 	exit "${2:-1}"
@@ -24,14 +31,6 @@ dep_check()
 	done
 
 	unset dep
-}
-
-note()
-{
-	: "${1:?}"
-
-	command -v notify-send > /dev/null &&
-		notify-send "󰟵 dpass" "$1"
 }
 
 search()

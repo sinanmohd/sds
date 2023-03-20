@@ -9,7 +9,7 @@ note()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send " dbook" "$1"
+		notify-send " dbook" "$1"
 }
 
 die()
@@ -141,7 +141,7 @@ rm_data()
 
 entry()
 {
-	printf "" | "$menu" -p " ${1:?} " ||
+	printf "" | "$menu" -p " ${1:?} " ||
 		die "input empty"
 }
 
@@ -252,11 +252,11 @@ main()
 		printf "%s\t|\t%s\n" "$name" "$data" >> "$book_conf"
 		;;
 	-d)
-		rm_data "${2:-"$(parse_name | "$menu" -p " " -l 25)"}"
+		rm_data "${2:-"$(parse_name | "$menu" -p " " -l 25)"}"
 		;;
 	-t)
 		shift > /dev/null 2>&1
-		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
+		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
 		[ -z "$data" ] &&
 			die "empty, use -i to add an entry"
 
@@ -271,7 +271,7 @@ main()
 		;;
 	-c)
 		shift > /dev/null 2>&1
-		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
+		data="${*:-"$(parse_name | "$menu" -p " " -l 25 | parse_data)"}"
 		[ -z "$data" ] &&
 			die "empty, use -i to add an entry"
 
@@ -290,7 +290,7 @@ main()
 	"")
 		dep_check "xdg-open"
 
-		data="$(parse_name | "$menu" -p " " -l 25 | parse_data)"
+		data="$(parse_name | "$menu" -p " " -l 25 | parse_data)"
 		[ -z "$data" ] &&
 			die "empty, use -i to add an entry"
 

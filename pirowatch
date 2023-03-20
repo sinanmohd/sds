@@ -8,13 +8,21 @@ torrent_port=49110
 dht_port=49130
 menu="wmenu"
 
+note()
+{
+	# usage: note "message"
+	: "${1:?}"
+
+	command -v "notify-send" 1>/dev/null &&
+		notify-send "  pirowatch" "$1"
+}
+
 die()
 {
 	# usage: die "reason" [exit_status]
 	: "${1:?}"
 
-	command -v "notify-send" 1>/dev/null &&
-		notify-send "  pirowatch" "$1"
+	note "$1"
 
 	printf "\033[31;1merr: %b\033[0m\n" "$1"
 	exit "${2:-1}"
@@ -40,7 +48,7 @@ stream() {
 	dep_check "webtorrent" "mpv"
 
 	command -v "notify-send" 1>/dev/null &&
-		notify-send " connecting to peers" "wait for few seconds"
+		note "connecting to peers, wait for few seconds"
 
 	if [ -n "$2" ]
 	then
@@ -63,7 +71,7 @@ set_index() {
 		grep -Ei "\.(mkv|mp4|webm|avi|mov|flv|flac|opus|ogg|mp3|wav) (.*)$")
 	if [ "$(echo "$fetch" | wc -l)" -gt 1 ]
 	then
-		fetch="$(printf "%s" "$fetch" | "$menu" -p "  " -l 25)" ||
+		fetch="$(printf "%s" "$fetch" | "$menu" -p " " -l 25)" ||
 			die "empty selection" 66
 	fi
 
@@ -87,7 +95,7 @@ main()
 
 	dep_check "$menu"
 
-	torrent="${1:-$torrent_dir/$(find "$torrent_dir" -type f -name "*.torrent" | sed 's/.*\///g' | "$menu" -p "  " -l 25)}"
+	torrent="${1:-$torrent_dir/$(find "$torrent_dir" -type f -name "*.torrent" | sed 's/.*\///g' | "$menu" -p " " -l 25)}"
 	[ -z "${torrent##"${torrent_dir}"/}" ] &&
 		die "magnet or torrent file not entered" 66
 	[ -d "$cache_dir" ] ||

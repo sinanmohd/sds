@@ -11,7 +11,7 @@ die()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send " damb" "$1"
+		notify-send "  damb" "$1"
 
 	printf "\033[31;1merr: %b\033[0m\n" "$1"
 	exit "${2:-1}"
@@ -31,7 +31,7 @@ dep_check()
 
 get_opt()
 {
-        printf "select\nlinks\nrandom\nstream\nstop" | "$menu" -p "הּ  "
+        printf "select\nlinks\nrandom\nstream\nstop" | "$menu" -p " "
 }
 
 get_ambs()
@@ -42,7 +42,7 @@ get_ambs()
 get_link()
 {
         grep -v "^#.*$" "$config_dir"/links |
-                grep "$(grep -v "^#.*$" "$config_dir"/links | cut -d '=' -f1 | "$menu" -p "  " -l 25)" |
+                grep "$(grep -v "^#.*$" "$config_dir"/links | cut -d '=' -f1 | "$menu" -p " " -l 25)" |
                 cut -d '=' -f2 | tr -d ' '
 }
 
@@ -56,7 +56,7 @@ main()
 	case "$(get_opt)" in
 	select)
 		dep_check "ffplay"
-		ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | "$menu" -p "  " -l 25)" &
+		ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | "$menu" -p " " -l 25)" &
 		echo "$!" >> "$pid_file"
 		;;
 	links)
