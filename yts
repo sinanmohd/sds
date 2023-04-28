@@ -1,7 +1,6 @@
 #!/bin/sh
 
 url_yts="https://yts.mx"
-proxy_yts="https://yts.torrentbay.to"
 menu="wmenu"
 
 die()
@@ -82,9 +81,6 @@ main()
 	query="${*:-$(printf "" | "$menu" -p " ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
-
-	curl -Is "$url_yts" > /dev/null ||
-		url_yts="$proxy_yts"
 
 	fetch="$(search_yts "$query")"
 	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p " " | tr ' ' '-')")"
