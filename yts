@@ -49,7 +49,7 @@ id_yts()
 	select=
 
 	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
-	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -l 25 -p " ")"
+	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -il 4 -p " ")"
 	[ -n "$select" ] &&
 		echo "$fetch" | grep "$select" | cut -d'"' -f2
 
@@ -79,7 +79,7 @@ main()
 
 	fetch="$(search_yts "$query")"
 
-	id="$(id_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')")"
+	id="$(id_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -il 20 -p "󰎁 " | tr ' ' '-')")"
 	[ -z "$id" ] &&
 		exit 1
 
