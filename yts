@@ -8,7 +8,7 @@ die()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send "  yts" "$1"
+		notify-send "󰎁  yts" "$1"
 
 	printf "\033[31;1merr: %b\033[0m\n" "$1"
 	exit "${2:-1}"
@@ -50,7 +50,7 @@ dllink_yts()
 	id=
 
 	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
-	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -l 25 -p " ")"
+	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -l 25 -p " ")"
 	[ -z "$select" ] &&
 		die "please select a quality"
 	id="$(echo "$fetch" | grep "$select" | cut -d'"' -f2)"
@@ -78,12 +78,12 @@ main()
 
 	dep_check "$menu"
 
-	query="${*:-$(printf "" | "$menu" -p " ")}"
+	query="${*:-$(printf "" | "$menu" -p "󱇒 ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 
 	fetch="$(search_yts "$query")"
-	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p " " | tr ' ' '-')")"
+	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')")"
 
 	[ -z "$dllink" ] &&
 		die "empty magnet"

@@ -8,7 +8,7 @@ die()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send "  1337x" "$1"
+		notify-send "󰎁  1337x" "$1"
 
 	printf "\033[31;1merr: %b\033[0m\n" "$1"
 	exit "${2:-1}"
@@ -68,12 +68,12 @@ main()
 
 	dep_check "$menu"
 
-	query="${*:-$(printf "" | "$menu" -p " ")}"
+	query="${*:-$(printf "" | "$menu" -p "󱇒 ")}"
 	[ -z "$query" ] &&
 		die "please enter a query"
 
 	fetch="$(search_1337x "$query")"
-	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | "$menu" -l 25 -p " " | tr ' ' '-')"
+	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')"
 	magnet="$(magnet_1337x "$(echo "$fetch" | grep "$select")")"
 
 	[ -z "$magnet" ] &&
