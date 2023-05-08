@@ -42,36 +42,31 @@ search_yts()
 		grep browse-movie-link | sed -e 's/^.*movies\///g' -e 's/".*$//g'
 }
 
-dllink_yts()
+id_yts()
 {
 	: "${1:?}"
 	fetch=
 	select=
-	id=
 
 	fetch="$(get_yts "movies/$1" | grep -Eo "value=\"[A-Z0-9]{40}\">[a-zA-Z0-9 ]*")"
 	select="$(echo "$fetch" | cut -d'>' -f2 | "$menu" -l 25 -p " ")"
-	[ -z "$select" ] &&
-		die "please select a quality"
-	id="$(echo "$fetch" | grep "$select" | cut -d'"' -f2)"
-	printf "${url_yts}/torrent/download/%s\n" "$id"
+	[ -n "$select" ] &&
+		echo "$fetch" | grep "$select" | cut -d'"' -f2
 
-	unset id
 	unset select
 	unset fetch
 }
 
 main()
 {
-	fetch=
-	dllink=
-	out=
 	query=
+	fetch=
+	id=
+	out=
 
 	[ -z "$WAYLAND_DISPLAY" ] &&
 		menu="dmenu"
-	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]
-	then
+	if [ "$#" -gt 0 ] && [ "$1" = "-o" ]; then
 		out=true
 		shift
 	fi
@@ -80,20 +75,19 @@ main()
 
 	query="${*:-$(printf "" | "$menu" -p "󱇒 ")}"
 	[ -z "$query" ] &&
-		die "please enter a query"
+		exit 1
 
 	fetch="$(search_yts "$query")"
-	dllink="$(dllink_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')")"
 
-	[ -z "$dllink" ] &&
-		die "empty magnet"
+	id="$(id_yts "$(echo "$fetch" | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')")"
+	[ -z "$id" ] &&
+		exit 1
 
-	if [ "$out" = true ]
-	then
-		echo "$dllink"
+	if [ "$out" = true ]; then
+		echo "${url_yts}/torrent/download/${id}"
 	else
 		dep_check "pirowatch"
-		pirowatch -s "$dllink"
+		pirowatch -s "${url_yts}/torrent/download/${id}"
 	fi
 }
 
