@@ -69,7 +69,7 @@ set_index() {
 		grep -Ei "\.(mkv|mp4|webm|avi|mov|flv|flac|opus|ogg|mp3|wav) (.*)$")
 	if [ "$(echo "$fetch" | wc -l)" -gt 1 ]
 	then
-		fetch="$(printf "%s" "$fetch" | "$menu" -p " " -l 25)" ||
+		fetch="$(printf "%s" "$fetch" | "$menu" -p "󰎁 " -l 25)" ||
 			die "empty selection" 66
 	fi
 
