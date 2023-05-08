@@ -20,7 +20,7 @@ dep_check()
 
 	for dep; do
 		command -v "$dep" 1>/dev/null ||
-			die "$dep not found, please install it" 127
+			die "${dep} not found, please install it" 127
 	done
 
 	unset dep
@@ -29,34 +29,77 @@ dep_check()
 get_1337x()
 {
 	: "${1:?}"
-	dep_check "curl"
+	dep_check curl
 
-	curl --silent -H 'Accept-Encoding: gzip,deflate, br' --compressed "${url_1337x}/$1"
+	curl --silent --compressed "${url_1337x}/$1"
 }
 
 search_1337x()
 {
 	: "${1:?}"
 
-	get_1337x "search/$(echo "$1" | tr ' ' '+')/1/" |
-		grep -o "[0-9][0-9][0-9][0-9][0-9][0-9][0-9]/[^/]*"
+	get_1337x "search/$(echo "$1" | tr ' ' '+')/1/"
 }
 
 magnet_1337x()
 {
 	: "${1:?}"
 
-	get_1337x "torrent/$1/" |
-		grep -om1 "magnet:?xt=urn:btih:.*announce"
+	get_1337x "torrent/${1}/" |
+		grep -om1 'magnet:?xt=urn:btih:.*announce'
+}
+
+parse_table()
+{
+	intbody=
+	link=
+	sneed=
+	leech=
+	size=
+
+	while read -r line; do
+		case "$line" in
+		"<tbody>")
+			intbody=1
+			;;
+		"</tbody>")
+			exit 0
+			;;
+		"<td class=\"coll-1 name"*)
+			line=${line%/\">*}
+			link=${line##*href=\"/}
+			;;
+		"<td class=\"coll-2 seeds"*)
+			sneed=${line#*>}
+			sneed=${sneed%%<*}
+			;;
+		"<td class=\"coll-3 leeches"*)
+			leech=${line#*>}
+			leech=${leech%%<*}
+			;;
+		"<td class=\"coll-4 size"*)
+			size=${line#*>}
+			size=${size%%<*}
+			;;
+		"</tr>")
+			[ "$intbody" = 1 ] &&
+				printf "%4d   %4d   %8s  %s\n" \
+					"$sneed" "$leech" "$size" \
+					"$(echo "${link##*/}" | tr '-' ' ')"
+			;;
+		esac
+	done | "$menu" -p "󰎁 " -il 20 | grep -o '[A-Z][a-z].*' | tr ' ' '-'
+
+	unset intbody name link sneed leech size
 }
 
 main()
 {
-	fetch=
-	select=
-	magnet=
-	out=
 	query=
+	data=
+	name=
+	page=
+	magnet=
 
 	[ -z "$WAYLAND_DISPLAY" ] &&
 		menu="dmenu"
@@ -64,19 +107,25 @@ main()
 		out=true
 		shift
 	fi
-
 	dep_check "$menu"
+
 
 	query="${*:-$(printf "" | "$menu" -p "󱇒 ")}"
 	[ -z "$query" ] &&
 		exit 1
 
-	fetch="$(search_1337x "$query")"
-	select="$(echo "$fetch" | sed -e's/^.*\///g' | tr '-' ' ' | "$menu" -l 25 -p "󰎁 " | tr ' ' '-')"
-	magnet="$(magnet_1337x "$(echo "$fetch" | grep "$select")")"
+	data="$(search_1337x "$query")"
+	[ -z "$data" ] &&
+		die "search failed, check your internet connection"
 
+	name="$(echo "$data" | parse_table)"
+	[ -z "$name" ] &&
+		exit 1
+
+	page="$(echo "$data" | grep -om1 "[0-9]*/${name}")"
+	magnet="$(magnet_1337x "$page")"
 	[ -z "$magnet" ] &&
-		die "empty torrent magnet"
+		die "magnet fetch failed, contact the maintainer"
 
 	if [ "$out" = true ]; then
 		echo "$magnet"
