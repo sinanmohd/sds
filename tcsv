@@ -10,7 +10,7 @@ die()
 	command -v notify-send > /dev/null &&
 		notify-send "󰎁  torrents-csv" "$1"
 
-	printf "\033[31;1merr: %b\033[0m\n" "$1"
+	printf "\033[31;1merr: %b\033[0m\n" "$1" 1>&2
 	exit "${2:-1}"
 }
 
