@@ -88,7 +88,7 @@ parse_table()
 					"$(echo "${link##*/}" | tr '-' ' ')"
 			;;
 		esac
-	done | "$menu" -p "󰎁 " -il 20 | grep -o '[A-Z][a-z].*' | tr ' ' '-'
+	done | "$menu" -p "󰎁 " -il 20 | sed 's/.*  //g' | tr ' ' '-'
 
 	unset intbody name link sneed leech size
 }
