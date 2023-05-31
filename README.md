@@ -35,6 +35,11 @@ as command line argument or input from dmenu and consoom the media using [mpv](h
 if you pass "-s" as the first argument it'll skip index selection to speed up
 the launching
 
+## tcsv
+posix client for torrents-csv.ml, has an optional dependency on pirowatch.
+if you pass "-o" as the first argument it'll print the magnet hash to stdout
+otherwise it will pass the magnet link to pirowatch
+
 ## 1337x
 scraper for 1337x.to, has an optional dependency on pirowatch. if you pass "-o"
 as the first argument it'll print the scraped magnet link to stdout otherwise
