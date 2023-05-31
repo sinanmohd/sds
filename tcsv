@@ -33,8 +33,8 @@ search_tcsv()
 
 	curl "${url_csv}/service/search?q=$(echo "$1" | tr ' ' '+')" \
 		--silent \
-		--compressed |
-			grep -o '"[^,}]*'
+		--compressed \
+		--write-out "%{http_code}"
 }
 
 byttounit()
@@ -119,6 +119,7 @@ wheremag()
 
 query=
 fetch=
+data=
 name=
 magnet=
 
@@ -133,13 +134,23 @@ dep_check "$menu"
 query="${*:-$(printf "" | "$menu" -p "󱇒 ")}"
 [ -z "$query" ] &&
 	exit 1
+
 fetch="$(search_tcsv "$query")"
-[ -z "$fetch" ] &&
+case "$fetch" in
+*200)
+	[ "$fetch" = '[]200' ] &&
+		die "no results found"
+	data="$(echo "$fetch" | grep -o '"[^,}]*')"
+	;;
+*)
 	die "search failed, check your internet connection"
-name="$(echo "$fetch" | parse_table)"
+	;;
+esac
+
+name="$(echo "$data" | parse_table)"
 [ -z "$name" ] &&
 	exit 1
-magnet="$(echo "$fetch" | wheremag "$name")"
+magnet="$(echo "$data" | wheremag "$name")"
 
 if [ "$out" = true ]; then
 	echo "$magnet"
