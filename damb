@@ -81,13 +81,14 @@ main()
 		paste=
 		dep_check "mpv"
 
-		if [ -z "$DISPLAY" ]
-		then
+		if [ -n "$WAYLAND_DISPLAY" ]; then
 			dep_check "wl-paste"
 			paste="$(wl-paste)"
-		else
+		elif [ -n "$DISPLAY" ]; then
 			dep_check "xclip"
 			paste="$(xclip -o -sel clip)"
+		else
+			die "tty supported, run a display server"
 		fi
 
 		mpv --no-video "$paste" &
