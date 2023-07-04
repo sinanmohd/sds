@@ -9,7 +9,7 @@ note()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send "  dunicode" "$1"
+		notify-send "󰞅  dunicode" "$1"
 }
 
 die()
@@ -49,9 +49,9 @@ get_glyph()
 
 	# shellcheck disable=SC2059
 	[ -n "${str#*\n}" ] &&
-		str="$(printf "$str" | "$menu" -p " ")"
+		str="$(printf "$str" | "$menu" -p "󰞅 ")"
 
-	str="$("$menu" -l 25 -p " " < "${data_dir}/${str}")"
+	str="$("$menu" -l 25 -p "󰞅 " < "${data_dir}/${str}")"
 	echo "${str%%[[:space:]]*}"
 
 	unset str
