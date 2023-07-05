@@ -289,6 +289,8 @@ main()
 		;;
 	"")
 		dep_check "xdg-open"
+		[ -s "$book_conf" ] ||
+			die "no bookmarks, try dbook -h"
 
 		data="$(parse_name | "$menu" -p " " -l 25 | parse_data)"
 		[ -z "$data" ] &&
