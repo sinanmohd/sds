@@ -2,7 +2,7 @@
 
 # dir where audio files are stored
 amb_dir="$HOME/.local/share/damb"
-pid_file="/tmp/damb.pid"
+pid_file="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/damb.pid"
 config_dir="$HOME/.config/damb"
 menu="wmenu"
 
