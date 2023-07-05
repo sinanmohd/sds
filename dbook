@@ -9,7 +9,7 @@ note()
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send " dbook" "$1"
+		notify-send "  dbook" "$1"
 }
 
 die()
@@ -141,7 +141,7 @@ rm_data()
 
 entry()
 {
-	printf "" | "$menu" -p " ${1:?} " ||
+	printf "" | "$menu" -p "  ${1:?} " ||
 		die "input empty"
 }
 
