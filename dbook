@@ -4,6 +4,22 @@ book_conf="${XDG_CONFIG_HOME:-$HOME/.config}/dbook/dbook.conf"
 book_data="${XDG_DATA_HOME:-$HOME/.local/share}/dbook"
 menu="wmenu"
 
+usage()
+{
+	cat <<- EOF
+	Usage: dbook command
+	a bookmark manager using dmenu
+	Commands:
+	  -h	show this help cruft
+	  -i	<bookmark string> [name], inset a new entry
+	  -s	<bookmark string> [name], inset a new entry and make a copy
+	  -d	[name], delete an entry
+	  -t	[name], type the data
+	  -c	[name], copy the date to clipboard
+
+	EOF
+}
+
 note()
 {
 	: "${1:?}"
@@ -205,17 +221,7 @@ main()
 
 	case "$1" in
 	-h|--help)
-		cat <<- EOF
-		Usage: dbook command
-		a bookmark manager using dmenu
-		Commands:
-		  -h	show this help cruft
-		  -i	[bookmark string] [bookmark name], inset a new entry
-		  -s	[bookmark string] [bookmark name], inset a new entry and make a copy
-		  -d	[bookmark name], delete an entry
-		  -t	[bookmark name], type the data
-		  -c	[bookmark name], copy the date to clipboard
-		EOF
+		usage
 		;;
 	-i)
 		data="${2:-$(entry name)}"
