@@ -32,7 +32,7 @@ dep_check()
 
 get_opt()
 {
-        printf "select\nlinks\nrandom\nstream\nstop" | "$menu" -p "$ico"
+        printf "select\nlinks\nstream\nstop" | "$menu" -p "$ico"
 }
 
 get_ambs()
@@ -63,11 +63,6 @@ main()
 	links)
 		dep_check "mpv"
 		mpv --no-video --no-resume-playback "$(get_link)" &
-		echo "$!" >> "$pid_file"
-		;;
-	random)
-		dep_check "ffplay"
-		ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | shuf -n1)" &
 		echo "$!" >> "$pid_file"
 		;;
 	stop)
