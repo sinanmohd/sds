@@ -262,6 +262,12 @@ insert|save)
 	;;
 rm)
 	key="${1:-$(key_menu)}" || exit 1
+
+	val="$(parse_data getval "$key")"
+	case "$val" in
+	${book_data}/*) rm "$val";;
+	esac
+
 	rm_data "$key"
 	;;
 "")
