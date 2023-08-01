@@ -236,30 +236,27 @@ case "$1" in
 esac
 
 case "$command" in
-insert)
+insert|save)
 	value="${1:-$(ip_menu "value")}" || exit 1
 	key="${2:-$(ip_menu "key")}" || exit 1
 
 	parse_data getval "$key" > /dev/null &&
 		die "key already in use"
-	[ -e "$value" ] &&
-		value="$(realpath "$value")"
 
-	printf "%s\t|\t%s\n" "$key" "$value" >> "$book_conf"
-	;;
-save)
-	value="${1:-$(ip_menu "value")}" || exit 1
-	key="${2:-$(ip_menu "key")}" || exit 1
-
-	parse_data getval "$key" > /dev/null &&
-		die "key already in use"
-	[  -d "$value" ] &&
-		warn "${value} is a directory, will not be saved"
-
-	if [ -f "$value" ]; then
-		cp "$value" "$book_data"
-		value="${book_data}/$(basename "$value")"
-	fi
+	case "$command" in 
+	insert)
+		[ -e "$value" ] &&
+			value="$(realpath "$value")"
+		;;
+	save)
+		[  -d "$value" ] &&
+			warn "${value} is a directory, will not be saved"
+		if [ -f "$value" ]; then
+			cp "$value" "$book_data"
+			value="${book_data}/$(basename "$value")"
+		fi
+		;;
+	esac
 
 	printf "%s\t|\t%s\n" "$key" "$value" >> "$book_conf"
 	;;
