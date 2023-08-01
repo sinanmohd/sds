@@ -2,7 +2,7 @@
 
 # dir where audio files are stored
 amb_dir="$HOME/.local/share/damb"
-pid_file="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/damb.pid"
+pid_file="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/damb.pids"
 config_dir="$HOME/.config/damb"
 menu="wmenu"
 ico="󰎆 "
@@ -30,9 +30,9 @@ dep_check()
 	unset dep
 }
 
-get_opt()
+menu_opt()
 {
-        printf "select\nlinks\nstream\nstop" | "$menu" -p "$ico"
+        printf "%s\n" "select" "links" "stream" "stop" | "$menu" -p "$ico"
 }
 
 get_ambs()
@@ -54,7 +54,7 @@ main()
 
 	dep_check "$menu"
 
-	case "$(get_opt)" in
+	case "$(menu_opt)" in
 	select)
 		dep_check "ffplay"
 		ffplay -volume 20 -nodisp -loop 0 "$amb_dir/$(get_ambs | "$menu" -p "$ico" -l 25)" &
