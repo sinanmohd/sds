@@ -68,6 +68,16 @@ dep_check()
 	unset dep
 }
 
+trim()
+{
+	: "${1:?}"
+
+	_trimstr="${1#"${1%%[![:space:]]*}"}"
+	_trimstr="${_trimstr%"${_trimstr##*[![:space:]]}"}"
+
+	echo "$_trimstr"
+}
+
 load_icon()
 {
 	case "$(file --brief --dereference --mime-type "$1")" in
@@ -100,12 +110,8 @@ parse_data()
 
 		_key="${line%%|*}"
 		_value="${line##*|}"
-
-		# trim leading and trailing white spaces
-		_key="${_key#"${_key%%[![:space:]]*}"}"
-		_key="${_key%"${_key##*[![:space:]]}"}"
-		_value="${_value#"${_value%%[![:space:]]*}"}"
-		_value="${_value%"${_value##*[![:space:]]}"}"
+		_key="$(trim "$_key")"
+		_value="$(trim "$_value")"
 
 		case "$_key" in
 		#*) continue
@@ -140,17 +146,10 @@ rm_data()
 	do
 		cl="$line\n"
 
-		key="${cl%%|*}"
-		# trim leading and trailing white spaces
-		key=${key#"${key%%[![:space:]]*}"}
-		key=${key%"${key##*[![:space:]]}"}
-
+		key="$(trim "${cl%%|*}")"
 		# catch match
 		if [ "$key" = "$1" ]; then
-			value="${cl##*|}"
-			# trim leading and trailing white spaces
-			value="${value#"${value%%[![:space:]]*}"}"
-			value="${value%"${value##*[![:space:]]}"}"
+			value="$(trim "${cl##*|}")"
 
 			# delete if saved
 			case "$value" in
