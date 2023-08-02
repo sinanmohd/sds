@@ -109,19 +109,19 @@ parse_data()
 		[ -z "$line" ] && continue
 
 		_key="${line%%|*}"
-		_value="${line##*|}"
 		_key="$(trim "$_key")"
-		_value="$(trim "$_value")"
 
 		case "$_key" in
 		#*) continue
 		esac
 
 		if [ "$1" = "getval" ]; then
-			if [ "$2" = "$_key" ]; then
-				echo "$_value"
-				return 0
-			fi
+			[ "$2" != "$_key" ] && continue
+
+			_value="${line##*|}"
+			_value="$(trim "$_value")"
+			echo "$_value"
+			return 0
 		else
 			echo "$(load_icon "$_value")" "$_key"
 		fi
