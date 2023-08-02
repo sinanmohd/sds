@@ -123,7 +123,7 @@ parse_data()
 			echo "$_value"
 			return 0
 		else
-			echo "$(load_icon "$_value")" "$_key"
+			echo "$_key"
 		fi
 	done < "$book_conf"
 
@@ -210,8 +210,7 @@ ip_menu()
 
 key_menu()
 {
-	key="$(parse_data | "$menu" -l 25 -p "${ico_dbk} key ")" || return 1
-	echo "${key#*  }"
+	parse_data | "$menu" -l 25 -p "${ico_dbk} key " || return 1
 }
 
 
@@ -238,6 +237,8 @@ case "$command" in
 insert|save)
 	value="${1:-$(ip_menu "value")}" || exit 1
 	key="${2:-$(ip_menu "key")}" || exit 1
+	value="$(trim "$value")"
+	key="$(trim "$key")"
 
 	parse_data getval "$key" > /dev/null &&
 		die "key already in use"
@@ -257,7 +258,12 @@ insert|save)
 		;;
 	esac
 
-	printf "%s\t|\t%s\n" "$key" "$value" >> "$book_conf"
+	case "$key" in
+	[![:cntrl:][:print:]]*) ;; # check for unicode chars
+	*)			icon="$(load_icon "$value")"
+	esac
+
+	printf "%s\t|\t%s\n" "${icon:+$icon }$key" "$value" >> "$book_conf"
 	;;
 rm)
 	key="${1:-$(key_menu)}" || exit 1
