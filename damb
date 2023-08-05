@@ -152,6 +152,10 @@ verify_val()
 {
 	# verify_val <value>
 
+	case "$1" in
+	*"\n"*) return 1 ;;
+	esac
+
 	case "$(file --brief --dereference --mime-type "$1")" in
 	audio/*|video/*) ;;
 	*)
@@ -216,7 +220,7 @@ set_clip()
 {
 	if [ -n "$WAYLAND_DISPLAY" ]; then
 		dep_check "wl-paste"
-		_clip="$(wl-paste)"
+		_clip="$(wl-paste -n)"
 	elif [ -n "$DISPLAY" ]; then
 		dep_check "xclip"
 		_clip="$(xclip -o)"
