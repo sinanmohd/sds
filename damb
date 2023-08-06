@@ -174,8 +174,7 @@ write_kv()
 	val="$(trim "$2")"
 
 	case "$key" in
-	[![:cntrl:][:print:]]*) ;; # check for unicode chars
-	*) key="$(gen_ico "$val") ${key}"
+	[[:print:]]*) key="$(gen_ico "$val") ${key}" ;;
 	esac
 
 	parse_keys getval "$key" > /dev/null &&
