@@ -3,6 +3,7 @@
 damb_conf="${XDG_CONFIG_HOME:-$HOME/.config}/damb/damb.conf"
 damb_data="${XDG_DATA_HOME:-$HOME/.local/share}/damb"
 damb_pids="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/damb.pids"
+damb_dlim="|"
 
 w_menu="wmenu"
 x_menu="dmenu"
@@ -89,7 +90,7 @@ parse_keys()
 	do
 		[ -z "$line" ] && continue
 
-		_key="${line%%|*}"
+		_key="${line%%"$damb_dlim"*}"
 		_key="$(trim "$_key")"
 
 		case "$_key" in
@@ -99,7 +100,7 @@ parse_keys()
 		if [ "$1" = "getval" ]; then
 			[ "$2" != "$_key" ] && continue
 
-			_value="${line##*|}"
+			_value="${line##*"$damb_dlim"}"
 			_value="$(trim "$_value")"
 			echo "$_value"
 			return 0
@@ -127,10 +128,10 @@ rm_key()
 	do
 		cl="$line\n"
 
-		key="$(trim "${cl%%|*}")"
+		key="$(trim "${cl%%"$damb_dlim"*}")"
 		# catch match
 		if [ "$key" = "$1" ]; then
-			value="$(trim "${cl##*|}")"
+			value="$(trim "${cl##*"$damb_dlim"}")"
 
 			# delete if saved
 			case "$value" in
@@ -154,6 +155,7 @@ verify_val()
 
 	case "$1" in
 	*"\n"*) return 1 ;;
+	*$damb_dlim*) return 1 ;;
 	esac
 
 	case "$(file --brief --dereference --mime-type "$1")" in
@@ -170,7 +172,8 @@ write_kv()
 	: "${1:?}"
 	: "${2:?}"
 
-	key="$(trim "$1")"
+	key="$(echo "$1" | tr -d "$damb_dlim")"
+	key="$(trim "$key")"
 	val="$(trim "$2")"
 
 	case "$key" in
@@ -182,7 +185,7 @@ write_kv()
 	verify_val "$val" ||
 		die "invalid: $val"
 
-	echo "$key | $val" >> "$damb_conf"
+	echo "${key:?} $damb_dlim $val" >> "$damb_conf"
 }
 
 kill_ambs()
