@@ -93,7 +93,7 @@ parse_keys()
 		_key="$(trim "$_key")"
 
 		case "$_key" in
-		#*) continue
+		\#*) continue
 		esac
 
 		if [ "$1" = "getval" ]; then
