@@ -154,8 +154,7 @@ verify_val()
 	# verify_val <value>
 
 	case "$1" in
-	*"\n"*) return 1 ;;
-	*$damb_dlim*) return 1 ;;
+	*"\n"*|*$damb_dlim*) return 1 ;;
 	esac
 
 	case "$(file --brief --dereference --mime-type "$1")" in
