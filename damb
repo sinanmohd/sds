@@ -5,7 +5,7 @@ damb_data="${XDG_DATA_HOME:-$HOME/.local/share}/damb"
 damb_pids="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/damb.pids"
 damb_dlim="|"
 
-w_menu="wmenu"
+w_menu="bemenu"
 x_menu="dmenu"
 
 ico_damb="󰎆 "
@@ -249,7 +249,7 @@ gen_opts()
 gen_menu()
 {
 	[ -s "$damb_conf" ] || die "empty, try damb save"
-	key="$(gen_opts | wmenu -l 25)" || return 1
+	key="$(gen_opts | bemenu -l 25)" || return 1
 
 	case "$key" in
 	*"stop the ambiances")

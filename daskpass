@@ -6,5 +6,5 @@ if [ -z "$WAYLAND_DISPLAY" ]
 then
 	printf "" | dmenu -P -p "$1"
 else
-	printf "" | wmenu -P -p "$1"
+	printf "" | bemenu -x -p "$1"
 fi

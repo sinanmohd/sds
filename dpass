@@ -1,7 +1,7 @@
 #!/bin/sh
 
 pass_store_dir="${PASSWORD_STORE_DIR:-$HOME/.pass}"
-menu="wmenu"
+menu="bemenu"
 
 note()
 {

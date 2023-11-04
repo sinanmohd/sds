@@ -2,7 +2,7 @@
 
 book_conf="${XDG_CONFIG_HOME:-$HOME/.config}/dbook/dbook.conf"
 book_data="${XDG_DATA_HOME:-$HOME/.local/share}/dbook"
-w_menu="wmenu"
+w_menu="bemenu"
 x_menu="dmenu"
 ico_dbk=" "
 ico_url="󰖟 "

@@ -1,8 +1,8 @@
 #!/bin/sh
 
-menu="wmenu"
+menu="bemenu"
 cache_dir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
-cache="$cache_dir/wmenu_run"
+cache="$cache_dir/bemenu_run"
 
 uptodate()
 {
@@ -38,9 +38,9 @@ main()
 
 	if [ -f "$cache" ] && uptodate
 	then
-		"$menu" "$@" < "$cache" | ${SHELL:-"/bin/sh"} &
+		"$menu" -p ' ' "$@" < "$cache" | ${SHELL:-"/bin/sh"} &
 	else
-		get_bin | sort -u | tee "$cache" | "$menu" "$@" | ${SHELL:-"/bin/sh"} &
+		get_bin | sort -u | tee "$cache" | "$menu" -p ' ' "$@" | ${SHELL:-"/bin/sh"} &
 	fi
 }
 

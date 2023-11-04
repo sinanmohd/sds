@@ -3,7 +3,7 @@ set -e
 
 data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/unicode"
 icon="󰞅 "
-menu="wmenu"
+menu="bemenu"
 
 note()
 {

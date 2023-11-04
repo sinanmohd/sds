@@ -6,7 +6,7 @@ cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/pirowatch"
 torrent_dir="${DOWNLOADS:-$HOME/Downloads}"
 torrent_port=49110
 dht_port=49130
-menu="wmenu"
+menu="bemenu"
 
 note()
 {
