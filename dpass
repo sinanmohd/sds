@@ -2,13 +2,14 @@
 
 pass_store_dir="${PASSWORD_STORE_DIR:-$HOME/.pass}"
 menu="bemenu"
+icon="󰟵 "
 
 note()
 {
 	: "${1:?}"
 
 	command -v notify-send > /dev/null &&
-		notify-send "󰟵  dpass" "$1"
+		notify-send "$icon dpass" "$1"
 }
 
 die()
@@ -42,8 +43,7 @@ search()
 	do
 		pass_path="${pass_path}/$(printf '%s\n' "$pass_path"/* |
 			sed 's/.*\///g' |
-			"$menu" -l 25 -p "󰟵 ${pass_path##*/} ")" ||
-			die "noting selected"
+			"$menu" -l 25 -p "$icon  ${pass_path##*/} ")" || exit 1
 	done
 
 	pass_path="${pass_path#"${pass_store_dir}"/}"
@@ -54,9 +54,7 @@ main()
 {
 	pass_path=
 
-	[ -z "$WAYLAND_DISPLAY" ] &&
-		menu="dmenu"
-
+	[ -z "$WAYLAND_DISPLAY" ] && menu="dmenu"
 	dep_check "$menu" "pass"
 
 	case "$1" in
@@ -88,15 +86,19 @@ main()
 		EOF
 		;;
 	""|-t)
+		search "$pass_store_dir"
+		secret="$(pass "$pass_path")" || {
+			note 'decryption failed'
+			exit
+		}
+
 		if [ -z "$WAYLAND_DISPLAY" ]
 		then
 			dep_check "xdotool"
-			search "$pass_store_dir"
-			xdotool type --delay 20 "$(pass "$pass_path")"
+			xdotool type --delay 20 "$secret"
 		else
 			dep_check "wtype"
-			search "$pass_store_dir"
-			wtype -d 20 "$(pass "$pass_path")"
+			wtype -d 20 "$secret"
 		fi
 		;;
 	*)
